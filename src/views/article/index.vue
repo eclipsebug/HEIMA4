@@ -35,25 +35,10 @@
           <div slot="label" class="publish-date">
             {{ articles.pubdate | relativeTime }}
           </div>
-          <van-button
-            @click="onFollow"
-            v-if="!articles.is_followed"
-            class="follow-btn"
-            type="info"
-            color="#3296fa"
-            round
-            size="small"
-            icon="plus"
-            >关注</van-button
-          >
-          <van-button
-            @click="onFollow"
-            v-else
-            class="follow-btn"
-            round
-            size="small"
-            >已关注</van-button
-          >
+          <FollowUser
+            :authId="articles.aut_id"
+            v-model="articles.is_followed"
+          ></FollowUser>
         </van-cell>
         <!-- /用户信息 -->
 
@@ -64,8 +49,13 @@
           v-html="articles.content"
         ></div>
         <van-divider>正文结束</van-divider>
+        <!-- 评论组件 -->
+        <CommentList :articleId="articles.art_id"></CommentList>
+        <!-- 评论组件 -->
       </div>
       <!-- /加载完成-文章详情 -->
+
+      <!-- 评论组件 -->
 
       <!-- 加载失败：404 -->
       <div class="error-wrap" v-else-if="isNotFound">
@@ -87,28 +77,52 @@
 
     <!-- 底部区域 -->
     <div class="article-bottom">
-      <van-button class="comment-btn" type="default" round size="small"
+      <van-button
+        class="write-btn"
+        type="default"
+        round
+        size="small"
+        @click="isPostShow = true"
         >写评论</van-button
       >
       <van-icon name="comment-o" info="123" color="#777" />
-      <van-icon color="#777" name="star-o" />
-      <van-icon color="#777" name="good-job-o" />
+      <CollectAtticle
+        :authId="articles.aut_id"
+        v-model="articles.is_collected"
+      ></CollectAtticle>
+
+      <Like :artId="articles.art_id" v-model="articles.attitude"></Like>
       <van-icon name="share" color="#777777"></van-icon>
     </div>
     <!-- /底部区域 -->
+    <!-- 发布文章评论 -->
+    <van-popup v-model="isPostShow" position="bottom">
+      <PostComment :articleId="articles.art_id"></PostComment>
+    </van-popup>
+    <!-- /发布文章评论 -->
   </div>
 </template>
 
 <script>
 import { getArticleById } from "@/api/article";
 import { ImagePreview } from "vant";
-import { addFollow, deleteFollow } from "@/api/user";
-
+// 引入封装的组件
+import FollowUser from "@/views/article/components/follow-user";
+import CollectAtticle from "@/views/article/components/collect-article";
+import Like from "@/views/article/components/like-article";
+import CommentList from "@/views/article/components/comment-list";
+import PostComment from "@/views/article/components/post-comment";
 // 引入
 import "github-markdown-css";
 export default {
   name: "ArticleIndex",
-  components: {},
+  components: {
+    FollowUser,
+    CollectAtticle,
+    Like,
+    CommentList,
+    PostComment,
+  },
   props: {
     articleId: {
       type: [Number, String],
@@ -120,7 +134,7 @@ export default {
       articles: {}, // 文章对象
       loading: false, // 文章加载状态
       isNotFound: false, // 标识当前不是404状态,
-      isFollowLoading: false, //关注状态
+      isPostShow: false,
     };
   },
   computed: {},
@@ -171,20 +185,6 @@ export default {
       } catch (e) {
         this.loading = false;
         this.isNotFound = e?.response?.status === 404;
-      }
-    },
-    async onFollow() {
-      console.log(this.articles.is_folllowed);
-      try {
-        if (this.articles.is_folllowed) {
-          await deleteFollow(this.articles.aut_id);
-        } else {
-          await addFollow(this.articles.aut_id);
-        }
-        this.articles.is_followed = !this.articles.is_followed;
-      } catch (error) {
-        console.log(error);
-        // this.$toast.fail("操作失败");
       }
     },
   },
