@@ -50,7 +50,10 @@
         ></div>
         <van-divider>正文结束</van-divider>
         <!-- 评论组件 -->
-        <CommentList :articleId="articles.art_id"></CommentList>
+        <CommentList
+          :list="commentList"
+          :articleId="articles.art_id"
+        ></CommentList>
         <!-- 评论组件 -->
       </div>
       <!-- /加载完成-文章详情 -->
@@ -97,7 +100,10 @@
     <!-- /底部区域 -->
     <!-- 发布文章评论 -->
     <van-popup v-model="isPostShow" position="bottom">
-      <PostComment :articleId="articles.art_id"></PostComment>
+      <PostComment
+        @postSuccess="postSuccess"
+        :articleId="articles.art_id"
+      ></PostComment>
     </van-popup>
     <!-- /发布文章评论 -->
   </div>
@@ -135,6 +141,7 @@ export default {
       loading: false, // 文章加载状态
       isNotFound: false, // 标识当前不是404状态,
       isPostShow: false,
+      commentList: [],
     };
   },
   computed: {},
@@ -144,6 +151,12 @@ export default {
   },
   mounted() {},
   methods: {
+    // 关闭弹层
+
+    postSuccess(data) {
+      this.isPostShow = false;
+      this.commentList.unshift(data);
+    },
     previewImg() {
       // 获取所有的img图片
       // src属性

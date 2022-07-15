@@ -33,10 +33,13 @@ export default {
     articleId: {
       type: String,
     },
+    list: {
+      type: Array,
+    },
   },
   data() {
     return {
-      list: [],
+      // list: [],
       source: this.articleId,
       loading: false,
       finished: false,

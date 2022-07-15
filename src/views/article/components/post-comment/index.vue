@@ -44,6 +44,9 @@ export default {
           duration: 0, //表示toast不会消失
           forbidClick: true, //禁用背景点击
         });
+        if (this.message.trim() === "") {
+          return this.$toast("内容不能为空！！");
+        }
         const res = await addComment({
           target: this.articleId, // 评论的目标id（评论文章即为文章id，对评论进行回复则为评论id）
           content: this.message, // 评论内容
@@ -51,6 +54,10 @@ export default {
         });
         console.log(res);
         this.$toast.success("发布评论成功");
+        // 成功后清空内容
+        this.message = "";
+        // 关闭弹层
+        this.$emit("postSuccess", res.data.data.new_obj);
       } catch (error) {
         this.$toast.fail("发布评论失败");
         console.log(error);
