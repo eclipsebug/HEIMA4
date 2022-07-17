@@ -51,6 +51,15 @@ const routes = [
     // 将路由鼎泰参数映射到组件 props中，更推荐
     props: true,
   },
+  // 编辑用户资料
+  {
+    path: "/user/profile",
+    component: () => import("@/views/user-profile/index.vue"),
+  },
+  {
+    path: "/discount",
+    component: () => import("@/views/discount-coupon"),
+  },
 ];
 
 const router = new VueRouter({

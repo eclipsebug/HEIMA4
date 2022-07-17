@@ -18,3 +18,6 @@ console.log(dayjs().to(dayjs("2020-11-11"))); // 多少年前
 Vue.filter("relativeTime", (value) => {
   return dayjs().to(dayjs(value));
 });
+Vue.filter("SJCTime", (value) => {
+  return dayjs(value).format("MM.DD hh:mm");
+});

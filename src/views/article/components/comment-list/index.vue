@@ -15,6 +15,7 @@
         v-for="(item, index) in list"
         :key="index"
         :comment="item"
+        @reply-ckick="$emit('replay-click', $event)"
       ></CommentItem>
     </van-list>
     <!-- 评论列表 -->
@@ -33,14 +34,22 @@ export default {
     articleId: {
       type: String,
     },
+    source: {
+      type: [String, Number],
+      require: true,
+    },
     list: {
       type: Array,
+    },
+    type: {
+      type: String,
+      default: "a",
     },
   },
   data() {
     return {
       // list: [],
-      source: this.articleId,
+      // source: this.articleId,
       loading: false,
       finished: false,
       offset: null, // 请求下一页数据的页码
@@ -52,7 +61,7 @@ export default {
     async onLoad() {
       try {
         const res = await getComments({
-          type: "a", // 评论类型，a-对文章(article)的评论，c-对评论(comment)的回复
+          type: this.type, // 评论类型，a-对文章(article)的评论，c-对评论(comment)的回复
           source: this.source, // 源id，文章id或评论id
           offset: this.offset, // 获取评论数据的偏移量，值为评论id，表示从此id的数据向后取，不传表示从第一页开始读取数据
           limit: this.limit, // 每页大小

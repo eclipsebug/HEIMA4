@@ -5,7 +5,7 @@
       class="page-nav-bar"
       left-arrow
       title="黑马头条"
-      @click="$router.back()"
+      @click="back"
     ></van-nav-bar>
     <!-- /导航栏 -->
 
@@ -52,7 +52,8 @@
         <!-- 评论组件 -->
         <CommentList
           :list="commentList"
-          :articleId="articles.art_id"
+          :source="articles.art_id"
+          @replay-click="onReplayClick"
         ></CommentList>
         <!-- 评论组件 -->
       </div>
@@ -106,6 +107,20 @@
       ></PostComment>
     </van-popup>
     <!-- /发布文章评论 -->
+
+    <!-- 评论回复 -->
+    <van-popup
+      v-if="isReplyShow"
+      v-model="isReplyShow"
+      position="bottom"
+      style="height: 95%"
+    >
+      <CommentReply
+        @close="isReplyShow = false"
+        :comment="currentComment"
+      ></CommentReply>
+    </van-popup>
+    <!-- /评论回复 -->
   </div>
 </template>
 
@@ -118,6 +133,7 @@ import CollectAtticle from "@/views/article/components/collect-article";
 import Like from "@/views/article/components/like-article";
 import CommentList from "@/views/article/components/comment-list";
 import PostComment from "@/views/article/components/post-comment";
+import CommentReply from "@/views/article/components/comment-reply.vue";
 // 引入
 import "github-markdown-css";
 export default {
@@ -128,8 +144,15 @@ export default {
     Like,
     CommentList,
     PostComment,
+    CommentReply,
+  },
+  provide() {
+    return {
+      articleId: this.articleId,
+    };
   },
   props: {
+    // 使用props路由动态的数据
     articleId: {
       type: [Number, String],
       required: true,
@@ -142,6 +165,8 @@ export default {
       isNotFound: false, // 标识当前不是404状态,
       isPostShow: false,
       commentList: [],
+      isReplyShow: false, //回复用户
+      currentComment: {},
     };
   },
   computed: {},
@@ -151,6 +176,16 @@ export default {
   },
   mounted() {},
   methods: {
+    back() {
+      this.$router.back();
+      console.log(1);
+    },
+    onReplayClick(comment) {
+      this.isReplyShow = true;
+
+      console.log(comment);
+      this.currentComment = comment;
+    },
     // 关闭弹层
 
     postSuccess(data) {
